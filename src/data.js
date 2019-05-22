@@ -716,6 +716,32 @@ export const EventData = [
     },
     {
       "GROUP_ID": 1,
+      "USER_ID": 139,
+      "NAME": "Third, Dude",
+      "START_DATE": "2019-05-08T12:00:00",
+      "END_DATE": "2019-05-09T00:00:00",
+      "NOTES": "",
+      "COVERING_FOR_ID": 0,
+      "IS_COVERED": false,
+      "ID": 6676,
+      "ALL_USERS": false,
+      "ON_DUTY_USERS": false
+    },
+    {
+      "GROUP_ID": 1,
+      "USER_ID": 139,
+      "NAME": "Fourth, Dude",
+      "START_DATE": "2019-05-08T12:00:00",
+      "END_DATE": "2019-05-09T00:00:00",
+      "NOTES": "",
+      "COVERING_FOR_ID": 0,
+      "IS_COVERED": false,
+      "ID": 6676,
+      "ALL_USERS": false,
+      "ON_DUTY_USERS": false
+    },
+    {
+      "GROUP_ID": 1,
       "USER_ID": 276,
       "NAME": "Sahota, Aneet",
       "START_DATE": "2019-05-09T00:00:00",

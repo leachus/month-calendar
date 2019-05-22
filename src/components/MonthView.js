@@ -91,16 +91,21 @@ const Styles = {
 		}
 		.react-calendar__month-view__days {
 			.react-calendar__tile {
-				padding: 6px 6px 0 1.5px;
+				padding: 28px 6px 0 1.5px;
 				background: none;
 				border: solid .5px #ccc !important;
 				border-left: none !important;
 				border-top: none !important;
 				font-family: monospace;
+				position: relative;
 				abbr {
 					display: inline-block;
 					padding: 6px;
-					margin-bottom: 4px;
+					margin: 0 auto 4px auto;
+					position: absolute;
+					top: 0;
+					left: 50%;
+					transform: translateX(-50%);
 				}
 				&:nth-child(7n) {
 					border-right: none !important;
@@ -136,25 +141,46 @@ function params(data) {
 
 export default function MonthView() {
 	const classes = useStyles();
-	const [ currentDate, setCurrentDate ] = useState(moment());
+	const [
+		currentDate,
+		setCurrentDate
+	] = useState(moment());
 
-	const [ calendarYear, setCalendarYear ] = useState(moment().year());
+	const [
+		calendarYear,
+		setCalendarYear
+	] = useState(moment().year());
 
-	const [ showList, setShowList ] = useGlobal('showList');
+	const [
+		showList,
+		setShowList
+	] = useGlobal('showList');
 
-	const [ group ] = useGlobal('group');
+	const [
+		group
+	] = useGlobal('group');
 
-	const [ calendarData, setCalendarData ] = useState([]);
+	const [
+		calendarData,
+		setCalendarData
+	] = useState([]);
 
-	const [ myShifts ] = useGlobal('myShifts');
+	const [
+		myShifts
+	] = useGlobal('myShifts');
 
-	const [ userId ] = useGlobal('userId');
+	const [
+		userId
+	] = useGlobal('userId');
 
 	useEffect(
 		() => {
 			getCalenderEventsFromServer(calendarYear, group.id).then((data) => setCalendarData(data));
 		},
-		[ group, calendarYear ]
+		[
+			group,
+			calendarYear
+		]
 	);
 
 	useEffect(
@@ -165,7 +191,9 @@ export default function MonthView() {
 				} catch (e) {}
 			}
 		},
-		[ showList ]
+		[
+			showList
+		]
 	);
 
 	function onClickDay(value) {
@@ -194,7 +222,7 @@ export default function MonthView() {
 							if (view == 'month') {
 								const events = byDate(date);
 								return (
-									<div>
+									<div className="events">
 										{events
 											.slice(0, 3)
 											.map((event) => (
@@ -236,7 +264,9 @@ export default function MonthView() {
 
 				{showList && (
 					<List className={classes.root} subheader={<li />}>
-						{[ ...Array(currentDate.daysInMonth()).keys() ].map((dateNum) => {
+						{[
+							...Array(currentDate.daysInMonth()).keys()
+						].map((dateNum) => {
 							const thisDate = moment(currentDate).date(dateNum + 1);
 							const events = byDate(thisDate);
 

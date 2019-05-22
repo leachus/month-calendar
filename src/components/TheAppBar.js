@@ -19,7 +19,10 @@ const useStyles = makeStyles((theme) => ({
 		marginRight: theme.spacing(2)
 	},
 	title: {
-		flexGrow: 1
+		flexGrow: 1,
+		whiteSpace: 'nowrap',
+		textOverflow: 'ellipsis',
+		overflowX: 'hidden'
 	}
 }));
 
@@ -42,10 +45,21 @@ HideOnScroll.propTypes = {
 
 function TheAppBar() {
 	const classes = useStyles();
-	const [ open, setOpen ] = useGlobal('sidebarOpen');
-	const [ showList, setShowList ] = useGlobal('showList');
-	const [ myShifts, setMyShifts ] = useGlobal('myShifts');
-	const [ group ] = useGlobal('group');
+	const [
+		open,
+		setOpen
+	] = useGlobal('sidebarOpen');
+	const [
+		showList,
+		setShowList
+	] = useGlobal('showList');
+	const [
+		myShifts,
+		setMyShifts
+	] = useGlobal('myShifts');
+	const [
+		group
+	] = useGlobal('group');
 	return (
 		<React.Fragment>
 			<HideOnScroll>
