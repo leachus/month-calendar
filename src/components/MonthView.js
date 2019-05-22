@@ -19,7 +19,7 @@ import {
 import moment from 'moment';
 import { makeStyles } from '@material-ui/core/styles';
 import { useGlobal } from 'reactn';
-import Cookies from 'js-cookie';
+
 import { AppUrl } from '../App';
 import axios from 'axios';
 
@@ -237,9 +237,16 @@ export default function MonthView() {
 	function calendarEventsByDate(data, date) {
 		date = moment(date);
 		return data.filter((event) => {
+			const end = moment(event.END_DATE);
+
+			if (end.hour() == 0) {
+				//events that end at 12:00am, need to be considered as ending the day prior
+				end.subtract(1, 'minute');
+			}
+
 			return (
 				moment(event.START_DATE).isSameOrBefore(date, 'day') &&
-				moment(event.END_DATE).isAfter(date, 'day') &&
+				end.isSameOrAfter(date, 'day') &&
 				(!myShifts || event.USER_ID == userId)
 			);
 		});
@@ -261,11 +268,17 @@ export default function MonthView() {
 					&nbsp;&nbsp;<Icon style={{ verticalAlign: 'middle' }}>arrow_forward</Icon>
 				</span>
 			);
-		} else {
+		} else if (date.isSame(end, 'day')) {
 			return (
 				<span>
 					<Icon style={{ verticalAlign: 'middle' }}>arrow_back</Icon>
 					&nbsp;&nbsp;{end.format('hh:mm a')}
+				</span>
+			);
+		} else {
+			return (
+				<span>
+					<Icon style={{ verticalAlign: 'middle' }}>arrow_back</Icon>&nbsp;&nbsp;<Icon style={{ verticalAlign: 'middle' }}>arrow_forward</Icon>
 				</span>
 			);
 		}
