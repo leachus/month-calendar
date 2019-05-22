@@ -1,0 +1,15 @@
+.react-calendar__tile {
+	min-height: 9em;
+	display: flex;
+	justify-content: flex-start;
+
+	flex-flow: column;
+	align-items: center;
+	flex-wrap: wrap;
+}
+.react-calendar__navigation__label {
+	font-size: 150%;
+}
+.react-calendar__tile--active {
+	background-color: #ddd;
+}
