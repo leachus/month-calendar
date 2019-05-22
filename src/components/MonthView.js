@@ -20,8 +20,9 @@ import moment from 'moment';
 import { makeStyles } from '@material-ui/core/styles';
 import { useGlobal } from 'reactn';
 
-import { AppUrl } from '../App';
+import { AppUrl, UseStaticData } from '../App';
 import axios from 'axios';
+import { EventData } from '../data';
 
 //ko
 const useStyles = makeStyles((theme) => ({
@@ -126,163 +127,63 @@ const Styles = {
 				}
 			}
 		}
-
-		.react-calendar__navigation button:enabled:hover {
-			background-color: transparent;
-		}
 	`
 };
 
 function params(data) {
 	return Object.keys(data).map((key) => `${key}=${encodeURIComponent(data[key])}`).join('&');
 }
+
 export default function MonthView() {
 	const classes = useStyles();
 	const [ currentDate, setCurrentDate ] = useState(moment());
 
-	const [ currentYear, setCurrentYear ] = useState(moment(currentDate).year());
+	const [ calendarYear, setCalendarYear ] = useState(moment().year());
 
 	const [ showList, setShowList ] = useGlobal('showList');
 
-	const [ group, setGroup ] = useGlobal('group');
+	const [ group ] = useGlobal('group');
 
 	const [ calendarData, setCalendarData ] = useState([]);
 
-	const [ myShifts, setMyShifts ] = useGlobal('myShifts');
+	const [ myShifts ] = useGlobal('myShifts');
 
-	const [ userId, setUserId ] = useGlobal('userId');
-
-	useEffect(
-		() => {
-			getCalenderEventsFromServer();
-		},
-		[ group ]
-	);
+	const [ userId ] = useGlobal('userId');
 
 	useEffect(
 		() => {
-			if (currentDate.year() !== currentYear) {
-				setCurrentYear(currentDate.year());
-				getCalenderEventsFromServer();
-			} else {
-				console.log('current year is current, no need to re-fetch data');
-			}
+			getCalenderEventsFromServer(calendarYear, group.id).then((data) => setCalendarData(data));
 		},
-		[ currentDate ]
+		[ group, calendarYear ]
 	);
-
-	// useEffect(
-	// 	() => {
-	// 		const data = group.id == 7 ? CalData.neuroSurg : CalData.neurology;
-	// 		setCalendarData(data);
-	// 	},
-	// 	[ group ]
-	// );
 
 	useEffect(
 		() => {
 			if (showList) {
-				document.getElementById(`date-index-${currentDate.format('D') - 1}`).scrollIntoView();
+				try {
+					document.getElementById(`date-index-${currentDate.format('D') - 1}`).scrollIntoView();
+				} catch (e) {}
 			}
 		},
 		[ showList ]
 	);
-	function eventName(event) {
-		if (event.ALL_USERS) {
-			return '* All Users *';
-		} else if (event.ON_DUTY_USERS) {
-			return '* On-Duty Users *';
-		} else if (event.USER_ID == 0) {
-			return '** Unassigned **';
-		} else {
-			return event.NAME;
-		}
-	}
-	function getCalenderEventsFromServer() {
-		const data = {
-			sd: moment(currentDate).startOf('year').format('MM-DD-YYYY'),
-			ed: moment(currentDate).endOf('year').format('MM-DD-YYYY'),
-			groupId: group.id
-		};
-
-		axios
-			.get(`${AppUrl}ui/callboard/getCalendarEvents`, {
-				withCredentials: true,
-				params: data
-			})
-			.then((response) => {
-				console.log('fetch response', response);
-				if (response.status !== 200) {
-					if (response.status === 401) {
-						window.location.href = `${AppUrl}login.aspx?ReturnUrl=${document.URL}`;
-					} else {
-						alert('There was an error fetching calendar events. Check your connection and try again.');
-					}
-					return;
-				}
-
-				console.log('json data', response.data);
-				setCalendarData(response.data);
-			})
-			.catch(() => {
-				alert('There was an error fetching calendar events. Check your connection and try again.');
-			});
-	}
 
 	function onClickDay(value) {
 		setCurrentDate(moment(value));
 		setShowList(true);
 	}
 
-	function calendarEventsByDate(data, date) {
-		date = moment(date);
-		return data.filter((event) => {
-			const end = moment(event.END_DATE);
-
-			if (end.hour() == 0) {
-				//events that end at 12:00am, need to be considered as ending the day prior
-				end.subtract(1, 'minute');
-			}
-
-			return (
-				moment(event.START_DATE).isSameOrBefore(date, 'day') &&
-				end.isSameOrAfter(date, 'day') &&
-				(!myShifts || event.USER_ID == userId)
-			);
-		});
+	//wrapper that passes the needed arguments to simplify the call in the jsx
+	function byDate(date) {
+		return calendarEventsByDate(calendarData, date, myShifts, userId);
 	}
 
-	function listedEventDateText(date, start, end) {
-		start = moment(start);
-		end = moment(end);
-
-		if (
-			(date.isSame(start, 'day') && date.isSame(end, 'day')) ||
-			(date.isSame(start, 'day') && end.hour() == 0 && end.day() - 1 == start.day())
-		) {
-			return <span>{`${start.format('hh:mm a')} - ${end.format('hh:mm a')}`}</span>;
-		} else if (date.isSame(start, 'day')) {
-			return (
-				<span>
-					{start.format('hh:mm a')}
-					&nbsp;&nbsp;<Icon style={{ verticalAlign: 'middle' }}>arrow_forward</Icon>
-				</span>
-			);
-		} else if (date.isSame(end, 'day')) {
-			return (
-				<span>
-					<Icon style={{ verticalAlign: 'middle' }}>arrow_back</Icon>
-					&nbsp;&nbsp;{end.format('hh:mm a')}
-				</span>
-			);
-		} else {
-			return (
-				<span>
-					<Icon style={{ verticalAlign: 'middle' }}>arrow_back</Icon>&nbsp;&nbsp;<Icon style={{ verticalAlign: 'middle' }}>arrow_forward</Icon>
-				</span>
-			);
+	function handleActiveDateChange({ activeStartDate, view }) {
+		if (activeStartDate.getFullYear() !== calendarYear) {
+			setCalendarYear(activeStartDate.getFullYear());
 		}
 	}
+
 	return (
 		<Container css={Styles.container}>
 			<Box my={4} style={{ margin: 0 }}>
@@ -291,8 +192,7 @@ export default function MonthView() {
 						calendarType="US"
 						tileContent={({ date, view }) => {
 							if (view == 'month') {
-								const events = calendarEventsByDate(calendarData, date);
-								console.log('events', events);
+								const events = byDate(date);
 								return (
 									<div>
 										{events
@@ -314,7 +214,7 @@ export default function MonthView() {
 								);
 							}
 						}}
-						//onChange={this.onChange}
+						onActiveDateChange={handleActiveDateChange}
 						onClickDay={onClickDay}
 						value={currentDate.toDate()}
 						css={Styles.calendar}
@@ -338,7 +238,7 @@ export default function MonthView() {
 					<List className={classes.root} subheader={<li />}>
 						{[ ...Array(currentDate.daysInMonth()).keys() ].map((dateNum) => {
 							const thisDate = moment(currentDate).date(dateNum + 1);
-							const events = calendarEventsByDate(calendarData, thisDate);
+							const events = byDate(thisDate);
 
 							if (events.length == 0) return null;
 
@@ -377,4 +277,106 @@ export default function MonthView() {
 			</Box>
 		</Container>
 	);
+}
+
+function getCalenderEventsFromServer(currentYear, groupId) {
+	const data = {
+		sd: `01-01-${currentYear}`,
+		ed: `12-31-${currentYear}`,
+		groupId: groupId
+	};
+	return new Promise((resolve, reject) => {
+		if (UseStaticData) {
+			resolve(EventData);
+			return;
+		}
+		axios
+			.get(`${AppUrl}ui/callboard/getCalendarEvents`, {
+				withCredentials: true,
+				params: data
+			})
+			.then((response) => {
+				console.log('fetch response', response);
+				if (response.status !== 200) {
+					if (response.status === 401) {
+						window.location.href = `${AppUrl}login.aspx?ReturnUrl=${document.URL}`;
+					} else {
+						alert('There was an error fetching calendar events. Check your connection and try again.');
+						reject();
+					}
+					return;
+				}
+
+				resolve(response.data);
+				// console.log('json data', response.data);
+				// setCalendarData(response.data);
+			})
+			.catch(() => {
+				alert('There was an error fetching calendar events. Check your connection and try again.');
+				reject();
+			});
+	});
+}
+
+function calendarEventsByDate(data, date, myShifts, userId) {
+	date = moment(date);
+
+	return data.filter((event) => {
+		const end = moment(event.END_DATE);
+
+		if (end.hour() == 0) {
+			//events that end at 12:00am, need to be considered as ending the day prior
+			end.subtract(1, 'minute');
+		}
+
+		return (
+			moment(event.START_DATE).isSameOrBefore(date, 'day') &&
+			end.isSameOrAfter(date, 'day') &&
+			(!myShifts || event.USER_ID == userId)
+		);
+	});
+}
+
+function listedEventDateText(date, start, end) {
+	start = moment(start);
+	end = moment(end);
+
+	if (
+		(date.isSame(start, 'day') && date.isSame(end, 'day')) ||
+		(date.isSame(start, 'day') && end.hour() == 0 && end.day() - 1 == start.day())
+	) {
+		return <span>{`${start.format('hh:mm a')} - ${end.format('hh:mm a')}`}</span>;
+	} else if (date.isSame(start, 'day')) {
+		return (
+			<span>
+				{start.format('hh:mm a')}
+				&nbsp;&nbsp;<Icon style={{ verticalAlign: 'middle' }}>arrow_forward</Icon>
+			</span>
+		);
+	} else if (date.isSame(end, 'day')) {
+		return (
+			<span>
+				<Icon style={{ verticalAlign: 'middle' }}>arrow_back</Icon>
+				&nbsp;&nbsp;{end.format('hh:mm a')}
+			</span>
+		);
+	} else {
+		return (
+			<span>
+				<Icon style={{ verticalAlign: 'middle' }}>arrow_back</Icon>&nbsp;&nbsp;<Icon style={{ verticalAlign: 'middle' }}>arrow_forward</Icon>
+			</span>
+		);
+	}
+}
+
+function eventName(event) {
+	if (event.ALL_USERS) {
+		return '* All Users *';
+	} else if (event.ON_DUTY_USERS) {
+		return '* On-Duty Users *';
+	} else if (event.USER_ID == 0) {
+		return '** Unassigned **';
+	} else {
+		return event.NAME;
+	}
 }

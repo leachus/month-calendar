@@ -45,6 +45,7 @@ function TheAppBar() {
 	const [ open, setOpen ] = useGlobal('sidebarOpen');
 	const [ showList, setShowList ] = useGlobal('showList');
 	const [ myShifts, setMyShifts ] = useGlobal('myShifts');
+	const [ group ] = useGlobal('group');
 	return (
 		<React.Fragment>
 			<HideOnScroll>
@@ -67,7 +68,7 @@ function TheAppBar() {
 							{showList && <KeyboardArrowLeft />}
 						</IconButton>
 						<Typography variant="h6" className={classes.title}>
-							Calendar
+							{group.name}
 						</Typography>
 						<Button
 							onClick={() => {
