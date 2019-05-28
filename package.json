@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"homepage": "https://mbmd.microbloggingmd.com/month-cal",
-	"proxy": "http://localhost/mbmd_previous",
+	"proxy": "https://mbmd.microbloggingmd.com",
 	"dependencies": {
 		"@emotion/core": "^10.0.10",
 		"@emotion/styled": "^10.0.10",
@@ -11,6 +11,7 @@
 		"@material-ui/icons": "next",
 		"@material-ui/styles": "next",
 		"axios": "^0.18.0",
+		"axios-progress-bar": "^1.2.0",
 		"js-cookie": "^2.2.0",
 		"m4ttheweric-react-scripts": "0.1.0",
 		"moment": "^2.24.0",
@@ -31,15 +32,7 @@
 		"extends": "react-app"
 	},
 	"browserslist": {
-		"production": [
-			">0.2%",
-			"not dead",
-			"not op_mini all"
-		],
-		"development": [
-			"last 1 chrome version",
-			"last 1 firefox version",
-			"last 1 safari version"
-		]
+		"production": [ ">0.2%", "not dead", "not op_mini all" ],
+		"development": [ "last 1 chrome version", "last 1 firefox version", "last 1 safari version" ]
 	}
 }

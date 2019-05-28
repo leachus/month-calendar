@@ -1,24 +1,5 @@
 export const Groups = [
-    {
-      "name": "* Additional emergency staff required stat",
-      "id": 161
-    },
-    {
-      "name": "* Horizon Health Evaluation",
-      "id": 172
-    },
-    {
-      "name": "* Mass Casualty Incident (MCI)",
-      "id": 159
-    },
-    {
-      "name": "Call Center Leadership",
-      "id": 78
-    },
-    {
-      "name": "Callboard Monitoring",
-      "id": 101
-    },
+   
     {
       "name": "Cardiology",
       "id": 53
@@ -723,7 +704,7 @@ export const EventData = [
       "NOTES": "",
       "COVERING_FOR_ID": 0,
       "IS_COVERED": false,
-      "ID": 6676,
+      "ID": 96676,
       "ALL_USERS": false,
       "ON_DUTY_USERS": false
     },
@@ -736,7 +717,7 @@ export const EventData = [
       "NOTES": "",
       "COVERING_FOR_ID": 0,
       "IS_COVERED": false,
-      "ID": 6676,
+      "ID": 996676,
       "ALL_USERS": false,
       "ON_DUTY_USERS": false
     },
@@ -810,7 +791,7 @@ export const EventData = [
       "USER_ID": 55,
       "NAME": "Goodwin, Matt",
       "START_DATE": "2019-05-21T00:00:00",
-      "END_DATE": "2019-05-21T12:00:00",
+      "END_DATE": "2019-05-22T00:00:00",
       "NOTES": "",
       "COVERING_FOR_ID": 0,
       "IS_COVERED": false,
@@ -823,7 +804,7 @@ export const EventData = [
       "USER_ID": 55,
       "NAME": "Goodwin, Matt",
       "START_DATE": "2019-05-22T00:00:00",
-      "END_DATE": "2019-05-22T12:00:00",
+      "END_DATE": "2019-05-23T00:00:00",
       "NOTES": "",
       "COVERING_FOR_ID": 0,
       "IS_COVERED": false,
@@ -835,8 +816,8 @@ export const EventData = [
       "GROUP_ID": 1,
       "USER_ID": 55,
       "NAME": "Goodwin, Matt",
-      "START_DATE": "2019-05-23T05:00:00",
-      "END_DATE": "2019-05-23T17:00:00",
+      "START_DATE": "2019-05-23T00:00:00",
+      "END_DATE": "2019-05-24T00:00:00",
       "NOTES": "",
       "COVERING_FOR_ID": 0,
       "IS_COVERED": false,
@@ -848,8 +829,8 @@ export const EventData = [
       "GROUP_ID": 1,
       "USER_ID": 55,
       "NAME": "Goodwin, Matt",
-      "START_DATE": "2019-05-24T06:00:00",
-      "END_DATE": "2019-05-24T19:00:00",
+      "START_DATE": "2019-05-24T00:00:00",
+      "END_DATE": "2019-05-25T00:00:00",
       "NOTES": "",
       "COVERING_FOR_ID": 0,
       "IS_COVERED": false,

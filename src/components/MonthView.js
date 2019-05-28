@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
@@ -6,21 +6,20 @@ import styled from '@emotion/styled';
 import {
 	Container,
 	Box,
-	Button,
 	Icon,
 	Chip,
 	Paper,
 	Typography,
 	List,
-	ListItem,
-	ListItemText,
-	ListSubheader
+	ListSubheader,
+	ButtonBase,
+	IconButton
 } from '@material-ui/core';
 import moment from 'moment';
 import { makeStyles } from '@material-ui/core/styles';
 import { useGlobal } from 'reactn';
 
-import { AppUrl, UseStaticData } from '../App';
+import { UseStaticData, LoginUrl } from '../App';
 import axios from 'axios';
 import { EventData } from '../data';
 
@@ -29,7 +28,11 @@ const useStyles = makeStyles((theme) => ({
 	root: {
 		width: '100%',
 		backgroundColor: theme.palette.background.paper,
-		position: 'relative'
+		position: 'relative',
+		marginTop: '5px',
+		maxWidth: '550px',
+		marginLeft: 'auto',
+		marginRight: 'auto'
 	},
 	listSection: {
 		backgroundColor: 'inherit'
@@ -39,15 +42,16 @@ const useStyles = makeStyles((theme) => ({
 		padding: 0
 	},
 	subheader: {
-		backgroundColor: theme.palette.grey[200],
 		color: '#111',
-		padding: theme.spacing(1, 2)
+		padding: theme.spacing(1, 2),
+		alignSelf: 'flex-start',
+		flexBasis: '85px'
 	},
 	listedEvent: {
-		padding: theme.spacing(2, 2),
+		padding: theme.spacing(1, 2),
 		backgroundColor: theme.palette.secondary.light,
 		color: 'white',
-		margin: theme.spacing(2)
+		margin: theme.spacing(0.5, 1)
 	}
 }));
 
@@ -68,6 +72,25 @@ const Overflow = css`
 	color: #222;
 `;
 
+const myBackground = 'background-color: #333;';
+
+const ListViewStyles = {
+	dayContainer: css`
+		display: flex;
+		margin-bottom: 12px;
+	`,
+	eventsContainer: css`
+		display: flex;
+		flex-flow: column;
+		flex-grow: 1;
+	`,
+	listedEvent: (mine) => {
+		return css`
+			${mine ? myBackground : ''};
+		`;
+	}
+};
+
 const Styles = {
 	container: css`
 		padding: 0;
@@ -75,112 +98,94 @@ const Styles = {
 		padding-right: 0;
 		margin: auto;
 	`,
-	chip: css`
-		margin-bottom: 2px;
-		height: 22px;
-		span {
-			padding-left: 8px;
-		}
-	`,
-	calendar: css`
-		border: none;
-		width: auto;
-		font-family: monospace !important;
-		abbr[title] {
-			text-decoration: none;
-		}
-		.react-calendar__month-view__days {
-			.react-calendar__tile {
-				padding: 28px 6px 0 1.5px;
-				background: none;
-				border: solid .5px #ccc !important;
-				border-left: none !important;
-				border-top: none !important;
-				font-family: monospace;
-				position: relative;
-				abbr {
-					display: inline-block;
-					padding: 6px;
-					margin: 0 auto 4px auto;
-					position: absolute;
-					top: 0;
-					left: 50%;
-					transform: translateX(-50%);
-				}
-				&:nth-child(7n) {
-					border-right: none !important;
-				}
-				&:nth-child(n + 29) {
-					border-bottom: none !important;
-				}
+	chip: (mine) => {
+		return css`
+			margin-bottom: 2px;
+			height: 22px;
+			cursor: pointer;
+			span {
+				padding-left: 8px;
 			}
 
-			.react-calendar__tile--active {
-				background-color: #e1e1e1;
-				&:hover {
-					background-color: #e1e1e1;
-				}
-				abbr {
-					color: rgba(0, 0, 0, 0.87);
-				}
-			}
-			.react-calendar__tile--now {
-				abbr {
-					background-color: #444;
-					color: white;
-					border-radius: 50%;
-				}
-			}
-		}
-	`
+			${mine ? myBackground : ''};
+		`;
+	}
 };
 
-function params(data) {
-	return Object.keys(data).map((key) => `${key}=${encodeURIComponent(data[key])}`).join('&');
-}
+const CalendarStyles = css`
+	border: none;
+	width: auto;
+	font-family: monospace !important;
+	margin: 5px 5px 0 5px;
+	abbr[title] {
+		text-decoration: none;
+	}
+	.react-calendar__month-view__days {
+		.react-calendar__tile {
+			padding: 28px 6px 0 1.5px;
+			background: none;
+			border: solid .5px #ccc !important;
+			border-left: none !important;
+			border-top: none !important;
+			font-family: monospace;
+			position: relative;
+			abbr {
+				display: inline-block;
+				padding: 6px;
+				margin: 0 auto 4px auto;
+				position: absolute;
+				top: 5px;
+				left: 50%;
+				transform: translateX(-50%);
+			}
+			&:nth-child(7n) {
+				border-right: none !important;
+			}
+			&:nth-child(n + 29) {
+				border-bottom: none !important;
+			}
+		}
 
+		.react-calendar__tile--active {
+			background-color: #e1e1e1;
+			&:hover {
+				background-color: #e1e1e1;
+			}
+			abbr {
+				color: rgba(0, 0, 0, 0.87);
+			}
+		}
+		.react-calendar__tile--now {
+			abbr {
+				background-color: #444;
+				color: white;
+				border-radius: 50%;
+			}
+		}
+	}
+`;
 export default function MonthView() {
 	const classes = useStyles();
-	const [
-		currentDate,
-		setCurrentDate
-	] = useState(moment());
+	const [ currentDate, setCurrentDate ] = useState(moment());
 
-	const [
-		calendarYear,
-		setCalendarYear
-	] = useState(moment().year());
+	const [ calendarMonth, setCalendarMonth ] = useState(moment().startOf('month'));
 
-	const [
-		showList,
-		setShowList
-	] = useGlobal('showList');
+	const [ showList, setShowList ] = useGlobal('showList');
 
-	const [
-		group
-	] = useGlobal('group');
+	const [ group ] = useGlobal('group');
 
-	const [
-		calendarData,
-		setCalendarData
-	] = useState([]);
+	const [ calendarData, setCalendarData ] = useState([]);
 
-	const [
-		myShifts
-	] = useGlobal('myShifts');
+	const [ myShifts ] = useGlobal('myShifts');
 
-	const [
-		userId
-	] = useGlobal('userId');
+	const [ userId ] = useGlobal('userId');
 
 	useEffect(
 		() => {
-			getCalenderEventsFromServer(calendarYear, group.id).then((data) => setCalendarData(data));
+			if (group.id > 0)
+				getCalenderEventsFromServer(calendarMonth, group.id).then((data) => setCalendarData(data));
 		},
-		[
-			group,
-			calendarYear
-		]
+		[ group, calendarMonth ]
 	);
 
 	useEffect(
@@ -191,9 +196,7 @@ export default function MonthView() {
 				} catch (e) {}
 			}
 		},
-		[
-			showList
-		]
+		[ showList ]
 	);
 
 	function onClickDay(value) {
@@ -207,8 +210,8 @@ export default function MonthView() {
 	}
 
 	function handleActiveDateChange({ activeStartDate, view }) {
-		if (activeStartDate.getFullYear() !== calendarYear) {
-			setCalendarYear(activeStartDate.getFullYear());
+		if (activeStartDate.getMonth() !== calendarMonth.month()) {
+			setCalendarMonth(moment(activeStartDate).startOf('month'));
 		}
 	}
 
@@ -220,43 +223,28 @@ export default function MonthView() {
 						calendarType="US"
 						tileContent={({ date, view }) => {
 							if (view == 'month') {
-								const events = byDate(date);
-								return (
-									<div className="events">
-										{events
-											.slice(0, 3)
-											.map((event) => (
-												<Chip
-													title={JSON.stringify(event)}
-													css={Styles.chip}
-													color="secondary"
-													label={eventName(event)}
-												/>
-											))}
-										{events.length > 3 && (
-											<CalContent css={Overflow}>
-												+ {(events.length - 3).toString()} more
-											</CalContent>
-										)}
-									</div>
-								);
+								return <TileContent events={byDate(date)} date={date} userId={userId} />;
 							}
 						}}
 						onActiveDateChange={handleActiveDateChange}
 						onClickDay={onClickDay}
 						value={currentDate.toDate()}
-						css={Styles.calendar}
+						css={CalendarStyles}
 						minDetail={'year'}
 						prev2Label={null}
 						prevLabel={
-							<Icon fontSize="large" color="primary">
-								keyboard_arrow_left
-							</Icon>
+							<IconButton>
+								<Icon fontSize="large" color="primary">
+									keyboard_arrow_left
+								</Icon>
+							</IconButton>
 						}
 						nextLabel={
-							<Icon fontSize="large" color="primary">
-								keyboard_arrow_right
-							</Icon>
+							<IconButton>
+								<Icon fontSize="large" color="primary">
+									keyboard_arrow_right
+								</Icon>
+							</IconButton>
 						}
 						next2Label={null}
 					/>
@@ -264,9 +252,7 @@ export default function MonthView() {
 
 				{showList && (
 					<List className={classes.root} subheader={<li />}>
-						{[
-							...Array(currentDate.daysInMonth()).keys()
-						].map((dateNum) => {
+						{[ ...Array(currentDate.daysInMonth()).keys() ].map((dateNum) => {
 							const thisDate = moment(currentDate).date(dateNum + 1);
 							const events = byDate(thisDate);
 
@@ -278,26 +264,37 @@ export default function MonthView() {
 									key={`section-${dateNum}`}
 									className={classes.listSection}
 								>
-									<ul className={classes.ul}>
+									<ul className={classes.ul} css={ListViewStyles['dayContainer']}>
 										<ListSubheader className={classes.subheader}>
 											<Typography
 												css={css`
 													font-size: 75%;
 													color: #444;
+													text-transform: uppercase;
 												`}
 											>
 												{thisDate.format('ddd')}
 											</Typography>
 											<Typography>{thisDate.format('MMM D')}</Typography>
 										</ListSubheader>
-										{calendarEventsByDate(calendarData, thisDate).map((event) => (
-											<Paper className={classes.listedEvent} color="secondary">
-												<Typography>{eventName(event)}</Typography>
-												<Typography css={css`color: #ccc;`}>
-													{listedEventDateText(thisDate, event.START_DATE, event.END_DATE)}
-												</Typography>
-											</Paper>
-										))}
+										<div css={ListViewStyles.eventsContainer}>
+											{byDate(thisDate).map((event) => (
+												<Paper
+													className={classes.listedEvent}
+													css={ListViewStyles.listedEvent(event.USER_ID == userId)}
+													color="secondary"
+												>
+													<Typography>{eventName(event)}</Typography>
+													<Typography css={css`color: #ccc;`}>
+														{listedEventDateText(
+															thisDate,
+															event.START_DATE,
+															event.END_DATE
+														)}
+													</Typography>
+												</Paper>
+											))}
+										</div>
 									</ul>
 								</li>
 							);
@@ -309,40 +306,86 @@ export default function MonthView() {
 	);
 }
 
-function getCalenderEventsFromServer(currentYear, groupId) {
+function TileContent({ events, userId, date }) {
+	console.log(userId);
+	return (
+		<ButtonBase
+			className="events"
+			css={css`
+				display: inline-block;
+				height: 100%;
+				width: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				padding-top: 32px;
+				box-sizing: border-box;
+			`}
+		>
+			{events
+				.slice(0, 3)
+				.map((event, i) => (
+					<Chip
+						title={`${event.NAME}, ${moment(event.START_DATE).format('MM-DD HH:mm')} - ${moment(
+							event.END_DATE
+						).format('MM-DD HH:mm')} `}
+						css={Styles.chip(event.USER_ID == userId)}
+						color="secondary"
+						label={eventName(event)}
+						key={event.ID + date.toString()}
+					/>
+				))}
+			{events.length > 3 && <CalContent css={Overflow}>+ {(events.length - 3).toString()} more</CalContent>}
+		</ButtonBase>
+	);
+}
+
+function mergeLikeEvents(data) {
+	return data.reduce((merged, event, i) => {
+		if (i == 0) {
+			merged.push(event);
+		} else {
+			const prevEvent = merged[merged.length - 1];
+
+			if (event.USER_ID == prevEvent.USER_ID && event.START_DATE == prevEvent.END_DATE) {
+				//this event is needlessly separated into two events, we can merge them
+				console.log('merging events');
+				merged[merged.length - 1] = { ...prevEvent, END_DATE: event.END_DATE };
+			} else {
+				merged.push(event);
+			}
+		}
+
+		return merged;
+	}, []);
+}
+
+function getCalenderEventsFromServer(calendarMonth, groupId) {
 	const data = {
-		sd: `01-01-${currentYear}`,
-		ed: `12-31-${currentYear}`,
+		sd: calendarMonth.format('MM-DD-YYYY'),
+		ed: moment(calendarMonth).endOf('month').format('MM-DD-YYYY'),
 		groupId: groupId
 	};
 	return new Promise((resolve, reject) => {
+		console.log('get cal events', data);
 		if (UseStaticData) {
-			resolve(EventData);
+			resolve(mergeLikeEvents(EventData));
 			return;
 		}
 		axios
-			.get(`${AppUrl}ui/callboard/getCalendarEvents`, {
-				withCredentials: true,
+			.get(`/ui/callboard/getCalendarEvents`, {
 				params: data
 			})
 			.then((response) => {
-				console.log('fetch response', response);
-				if (response.status !== 200) {
-					if (response.status === 401) {
-						window.location.href = `${AppUrl}login.aspx?ReturnUrl=${document.URL}`;
-					} else {
-						alert('There was an error fetching calendar events. Check your connection and try again.');
-						reject();
-					}
-					return;
-				}
-
-				resolve(response.data);
-				// console.log('json data', response.data);
-				// setCalendarData(response.data);
+				const merged = mergeLikeEvents(response.data);
+				resolve(merged);
 			})
-			.catch(() => {
-				alert('There was an error fetching calendar events. Check your connection and try again.');
+			.catch((error) => {
+				if (error.response && error.response.status === 401) {
+					window.location.href = LoginUrl;
+				} else {
+					alert('There was an error fetching calendar events. Check your connection and try again.');
+				}
 				reject();
 			});
 	});
@@ -383,7 +426,7 @@ function listedEventDateText(date, start, end) {
 				&nbsp;&nbsp;<Icon style={{ verticalAlign: 'middle' }}>arrow_forward</Icon>
 			</span>
 		);
-	} else if (date.isSame(end, 'day')) {
+	} else if (date.isSame(moment(end).subtract(1, 'minute'), 'day')) {
 		return (
 			<span>
 				<Icon style={{ verticalAlign: 'middle' }}>arrow_back</Icon>

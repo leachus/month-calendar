@@ -1,35 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import logo from './logo.svg';
+import React, { useEffect } from 'react';
+import 'axios-progress-bar/dist/nprogress.css';
 import './App.scss';
 import TheAppBar from './components/TheAppBar';
 import MonthView from './components/MonthView';
 import { Toolbar } from '@material-ui/core';
-import { setGlobal, getGlobal, useGlobal } from 'reactn';
+import { setGlobal, useGlobal } from 'reactn';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import moment from 'moment';
 import { Groups } from './data';
+import { loadProgressBar } from 'axios-progress-bar';
 
-export const AppUrl = 'https://mbmd.microbloggingmd.com/';
-
-export const UseStaticData = true;
+export const LoginUrl = `/login.aspx?ReturnUrl=${encodeURIComponent(document.URL)}`;
 
 setGlobal({
 	sidebarOpen: false,
 	showList: false,
 	group: { id: 0, name: '' },
 	groups: [],
-	userId: Cookies.get('LAST_VALID_USER'),
+	userId: Cookies.get('LAST_VALID_USER') || 0,
 	myShifts: false,
 	currentDate: moment()
 });
+
+loadProgressBar();
+
+export const UseStaticData = false;
 
 axios.defaults.withCredentials = true;
 
 function App() {
 	const [ group, setGroup ] = useGlobal('group');
 	const [ groups, setGroups ] = useGlobal('groups');
-	const [ loading, setLoading ] = useState(true);
 
 	useEffect(() => {
 		fetchGroups();
@@ -40,7 +42,7 @@ function App() {
 			if (groups.length > 0) {
 				console.log('groups has changed and is longer than 0', groups);
 				setGroup({ ...groups[0] });
-				setLoading(false);
+
 				console.log('set loading to false!');
 			}
 		},
@@ -53,31 +55,26 @@ function App() {
 			return;
 		}
 		axios
-			.get(`${AppUrl}templates/GetCallboardGroups`)
+			.get(`/templates/GetCallboardGroups`)
 			.then((response) => {
-				console.log('groups response: ', response);
-				if (response.status !== 200) {
-					if (response.status === 401) {
-						window.location.href = `${AppUrl}login.aspx?ReturnUrl=${document.URL}`;
-					} else {
-						alert('There was an error fetching groups data. Check your connection and try again. 1');
-						setLoading(false);
-					}
-					return;
-				}
 				setGroups([ ...response.data ]);
 			})
-			.catch(() => {
-				alert('There was an error fetching groups data. Check your connection and try again. 2');
-				setLoading(false);
-			});
+			.catch((error) => {
+				console.log('fetch groups error');
+				console.log(error);
+
+				if (error.response && error.response.status === 401) {
+					alert('You must first login to continue.');
+					window.location.href = LoginUrl;
+				}
+			})
+			.finally(() => {});
 	}
 	return (
 		<React.Fragment>
 			<TheAppBar />
 			<Toolbar />
-			{loading && <div>LOADING...</div>}
-			{!loading && <MonthView />}
+			<MonthView />
 		</React.Fragment>
 	);
 }

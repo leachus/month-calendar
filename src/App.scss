@@ -1,18 +1,26 @@
 .react-calendar__tile {
 	min-height: 9em;
-
-	div.events {
-		display: flex;
-		justify-content: flex-start;
-		overflow: hidden;
-		flex-flow: column;
-		align-items: flex-start;
-		flex-wrap: wrap;
-	}
 }
 .react-calendar__navigation__label {
 	font-size: 150%;
 }
 .react-calendar__tile--active {
 	background-color: #ddd;
+}
+
+#nprogress .bar {
+	background: #222 !important;
+	z-index: 1200;
+}
+.react-calendar__navigation {
+	> button {
+		padding: 0 !important;
+	}
+
+	button {
+		&:hover,
+		&:focus {
+			background-color: transparent !important;
+		}
+	}
 }

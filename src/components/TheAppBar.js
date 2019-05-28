@@ -45,21 +45,10 @@ HideOnScroll.propTypes = {
 
 function TheAppBar() {
 	const classes = useStyles();
-	const [
-		open,
-		setOpen
-	] = useGlobal('sidebarOpen');
-	const [
-		showList,
-		setShowList
-	] = useGlobal('showList');
-	const [
-		myShifts,
-		setMyShifts
-	] = useGlobal('myShifts');
-	const [
-		group
-	] = useGlobal('group');
+	const [ open, setOpen ] = useGlobal('sidebarOpen');
+	const [ showList, setShowList ] = useGlobal('showList');
+	const [ myShifts, setMyShifts ] = useGlobal('myShifts');
+	const [ group ] = useGlobal('group');
 	return (
 		<React.Fragment>
 			<HideOnScroll>
