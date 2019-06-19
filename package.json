@@ -1,38 +1,46 @@
 {
-	"name": "month-calendar",
-	"version": "0.1.0",
-	"private": true,
-	"homepage": "https://mbmd.microbloggingmd.com/month-cal",
-	"proxy": "https://mbmd.microbloggingmd.com",
-	"dependencies": {
-		"@emotion/core": "^10.0.10",
-		"@emotion/styled": "^10.0.10",
-		"@material-ui/core": "next",
-		"@material-ui/icons": "next",
-		"@material-ui/styles": "next",
-		"axios": "^0.18.0",
-		"axios-progress-bar": "^1.2.0",
-		"js-cookie": "^2.2.0",
-		"m4ttheweric-react-scripts": "0.1.0",
-		"moment": "^2.24.0",
-		"node-sass": "^4.12.0",
-		"prop-types": "latest",
-		"react": "^16.8.6",
-		"react-calendar": "^2.18.1",
-		"react-dom": "^16.8.6",
-		"reactn": "^2.0.1"
-	},
-	"scripts": {
-		"start": "react-scripts start",
-		"build": "react-scripts build",
-		"test": "react-scripts test",
-		"eject": "react-scripts eject"
-	},
-	"eslintConfig": {
-		"extends": "react-app"
-	},
-	"browserslist": {
-		"production": [ ">0.2%", "not dead", "not op_mini all" ],
-		"development": [ "last 1 chrome version", "last 1 firefox version", "last 1 safari version" ]
-	}
+  "name": "month-calendar",
+  "version": "0.2.0",
+  "private": true,
+  "homepage": "https://mbmd.microbloggingmd.com/month-cal",
+  "proxy": "https://mbmd.microbloggingmd.com",
+  "dependencies": {
+    "@emotion/core": "^10.0.10",
+    "@emotion/styled": "^10.0.10",
+    "@material-ui/core": "next",
+    "@material-ui/icons": "next",
+    "@material-ui/styles": "next",
+    "axios": "^0.18.0",
+    "axios-progress-bar": "^1.2.0",
+    "js-cookie": "^2.2.0",
+    "m4ttheweric-react-scripts": "0.1.0",
+    "moment": "^2.24.0",
+    "node-sass": "^4.12.0",
+    "prop-types": "latest",
+    "react": "^16.8.6",
+    "react-calendar": "^2.18.1",
+    "react-dom": "^16.8.6",
+    "reactn": "^2.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }
