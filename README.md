@@ -1,4 +1,44 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Month Calendar
+
+This is a standalone react project that will work alongside existing installations of MBMD. It was built using Material UI and ReactJS. It supports a list view as well as the ability to view "only my shifts".
+
+## Installation & Deployment
+
+1. Clone this repo
+2. Before building for a client site, there are a few settings that need to be set up in the package.json and one other place.
+
+In package.json, you need to set these two settings to correspond to the site url and the directory where it's going to be deployed. For example, at our demo site, if deplying to a subdirectory `/month-cal` you would set the package.json up like so:
+
+```json
+{
+  "homepage": "https://mbmd.microbloggingmd.com/month-cal",
+  "proxy": "https://mbmd.microbloggingmd.com",
+}
+```
+
+Finally, in App.js, you will want to make sure that the variable `const UseStaticData` is set to false. This is a development flag used for simulating real data with static data. If it is set incorrectly, the calendar will not fetch anything from the site's db.
+
+3. In order to create a production build, from the project directory, run: `npm run build`. This will create a directory called **build** in the project directory. This folder is the one you will be copying over to the client's web server, the contents of which need to be deployed into whatever directory you specified in the package.json for "homepage".
+
+4. Before deployment, there needs to be one template API created. It needs to be named **GetCallboardGroups**, set to **Authenticate By Session** and set as an API by checking the **This Template is an API** checkbox. Below is the code required in for SQL/View:
+
+**SQL:**
+
+```SQL
+select NAME_WITH_TAG name, id from VW_MBMD_GROUPS where GROUP_TYPE = 'callboard' and id in (select * from dbo.getvisiblecallboards(@LAST_VALID_USER)) order by name
+```
+**View:**
+```C#
+<%
+    //default api output: first sql query will be returned as JSON array.
+    string output = "";
+    output = ToJson(this.Table(0));
+%>
+
+<%=output%>
+```
+
+5. Finally, copy the files from the build directory over to the client webserver and you should be good to go.
 
 ## Available Scripts
 
@@ -12,11 +52,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.<br>
 You will also see any lint errors in the console.
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
 ### `npm run build`
 
 Builds the app for production to the `build` folder.<br>
@@ -27,42 +62,3 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
