@@ -15,7 +15,7 @@
     "js-cookie": "^2.2.0",
     "m4ttheweric-react-scripts": "0.1.0",
     "moment": "^2.24.0",
-    "node-sass": "^4.12.0",
+    "node-sass": "^7.0.0",
     "prop-types": "latest",
     "react": "^16.8.6",
     "react-calendar": "^2.18.1",
